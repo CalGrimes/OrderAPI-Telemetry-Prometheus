@@ -17,20 +17,11 @@ rule_files:
   # - "second_rules.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: 'prometheus'
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
+  - job_name: 'aspire-dashboard'
     static_configs:
-      - targets: ['localhost:9090']
-  - job_name: 'application'
+      - targets: ['aspire-dashboard:18888']
 
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
+  - job_name: 'order-api'
     static_configs:
-      - targets: ['order-api']
+      - targets: ['order-api:5000']
