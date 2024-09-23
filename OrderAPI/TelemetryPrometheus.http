@@ -1,0 +1,5 @@
+﻿@HOST = https://localhost:7127
+
+## Order a product
+POST {{HOST}}/api/order/create?userId=1&storeId=1&quantity=1&product.name=product1&product.price=1
+Accept: application/json

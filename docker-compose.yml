@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:8.0.0
+    ports:
+      - "18888:18888"
+      - "4317:18889"
+    container_name: aspire-dashboard
+    stdin_open: true
+    tty: true
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:18888
+      - DOTNET_DASHBOARD_OTLP_ENDPOINT_URL=http://0.0.0.0:18889
+
+  order-api:
+    build:
+      context: ./OrderAPI
+      dockerfile: Dockerfile
+    container_name: order-api
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
+    volumes:
+      - ${HOME}/.aspnet/https:/https:ro
+    depends_on:
+      - aspire-dashboard
+    labels:
+      - "Docker"
+    stdin_open: true
+    tty: true
