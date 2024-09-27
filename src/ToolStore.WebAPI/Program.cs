@@ -1,17 +1,38 @@
-using Microsoft.Extensions.Diagnostics.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
-using TelemetryPrometheus;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(opts =>
+{
+    opts.SwaggerDoc("v1", new OpenApiInfo()
+    {
+        Title = "ToolStore API",
+        Version = "v1"
+    });
+});
+
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.RegisterInfrastureDependencies(builder.Configuration);
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(MetricsBuilderExtensions =>
     {
+        MetricsBuilderExtensions.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("TelemetryPrometheus"));
         MetricsBuilderExtensions.AddMeter("Microsoft.AspNetCore.Hosting");
         MetricsBuilderExtensions.AddMeter("Microsoft.AspNetCore.Server.Kestrel");
         MetricsBuilderExtensions.AddMeter("System.Net.Http");
+        MetricsBuilderExtensions.AddMeter("Microsoft.AspNetCore.Routing");
+        MetricsBuilderExtensions.AddMeter("Microsoft.AspNetCore.Diagnostics");
+        MetricsBuilderExtensions.AddMeter("Microsoft.AspNetCore.RateLimiting");
         MetricsBuilderExtensions.AddPrometheusExporter();
 
         MetricsBuilderExtensions.AddOtlpExporter();
@@ -33,10 +54,6 @@ builder.Services.AddCors(options =>
                     .AllowAnyHeader();
         });
 });
-
-
-builder.Services.AddSingleton<OrderRepository>();
-
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
