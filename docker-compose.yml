@@ -5,9 +5,9 @@ networks:
     name: toolstore-network
 
 services:
-  mssql:
+  db:
     build: 
-      context: ./scripts/sql
+      context: ./db
     ports:
       - "1433:1433"  
     environment:
