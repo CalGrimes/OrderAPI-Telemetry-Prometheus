@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/dotnet/aspire-dashboard:8.0.0
+COPY . /app
+
+EXPOSE 18888
+EXPOSE 4317
+
+ENV  ASPNETCORE_URLS=http://0.0.0.0:18888
+ENV DOTNET_DASHBOARD_OTLP_ENDPOINT_URL=http://0.0.0.0:18889
